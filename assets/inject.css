@@ -1,0 +1,45 @@
+#header_search_form {
+  padding-right: 157px !important;
+}
+
+#emoji_replacer {
+  right: 115px;
+  position: absolute;
+  top: 12px;
+  height: 30px;
+  border: 1px solid #EEE;
+  border-radius: .25rem;
+  -webkit-user-select: none;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  padding: 4px 7px 2px;
+}
+
+#emoji_replacer:hover {
+  background: #f1f7fa;
+  border: 1px solid #ccc;
+}
+
+#emoji_replacer i {
+  line-height: 16px;
+}
+
+#emoji_replacer i:before {
+  content: '\1f603';
+  display: inline-block;
+  font-size: .8rem;
+  text-align: center;
+  -webkit-user-select: none;
+  font-style: normal;
+}
+
+#emoji_replacer:hover i:before {
+  content: '\1f606';
+}
+
+#emoji_replacer.disabled i:before {
+  content: '\1f629';
+}
+
+#emoji_replacer.disabled:hover i:before {
+  content: '\1f62b';
+}

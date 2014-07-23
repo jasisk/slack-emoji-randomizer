@@ -1,0 +1,17 @@
+{
+  "name": "slack-emoji-randomizer",
+  "version": "0.0.0",
+  "description": "randomly replaces emoji in slack after 5 seconds",
+  "main": "index.js",
+  "dependencies": {
+    "brfs": "^1.1.2",
+    "browserify": "^4.2.3",
+    "insert-css": "^0.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "browserify -t brfs index.js -o build/slack-emoji-randomizer.js"
+  },
+  "author": "Jean-Charles Sisk <jasisk@gmail.com>",
+  "license": "MIT"
+}
