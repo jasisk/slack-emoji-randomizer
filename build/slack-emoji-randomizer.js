@@ -4,34 +4,34 @@ var randomizer = require('./lib/randomizer');
 var insertCss = require('insert-css');
 
 
-var html = "<a id=\"emoji_replacer\" title=\"Replace Emoji\" class=\"normal\"><i></i></a>\n";
-var css = "#header_search_form {\n  padding-right: 157px !important;\n}\n\n#emoji_replacer {\n  right: 115px;\n  position: absolute;\n  top: 12px;\n  height: 30px;\n  border: 1px solid #EEE;\n  border-radius: .25rem;\n  -webkit-user-select: none;\n  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);\n  padding: 4px 7px 2px;\n}\n\n#emoji_replacer:hover {\n  background: #f1f7fa;\n  border: 1px solid #ccc;\n}\n\n#emoji_replacer i {\n  line-height: 16px;\n}\n\n#emoji_replacer i:before {\n  content: '\\1f603';\n  display: inline-block;\n  font-size: .8rem;\n  text-align: center;\n  -webkit-user-select: none;\n  font-style: normal;\n}\n\n#emoji_replacer:hover i:before {\n  content: '\\1f606';\n}\n\n#emoji_replacer.disabled i:before {\n  content: '\\1f629';\n}\n\n#emoji_replacer.disabled:hover i:before {\n  content: '\\1f62b';\n}\n";
+var html = "<a id=\"emoji_toggle\" title=\"Replace Emoji\" class=\"flexpane_toggle_button\"><i class=\"ts_icon ts_icon_emoji\"></i></a>\n";
+var css = "#header_search_form {\n  width: 270px;\n  right: 45px;\n}\n\n#client-ui.flex_pane_showing:not(.details_showing) #header_search_form {\n  width: 347px;\n}\n\n#emoji_toggle {\n  position: absolute;\n  top: 9pt;\n  right: 125px;\n}\n\n#emoji_toggle:hover {\n  color: #08dd19;\n}\n\n#emoji_toggle.enabled,\n#emoji_toggle.enabled:hover {\n  color: #67686e !important;\n  background-color: #f7f7f7 !important;\n  border-color: rgba(0,0,0,.12) !important;\n  box-shadow: inset 0 1px 2px 0 rgba(0,0,0,.075) !important;\n}\n\n\n.ts_icon_emoji {\n  top: 4px !important;\n}\n\n.ts_icon_emoji:before {\n  content: '\\E137';\n}\n";
 
 insertCss(css);
 
-var icon = document.getElementById('help_icon');
+var icon = document.getElementById('recent_mentions_toggle');
 var emojiNode = stringToFragment(html).firstChild;
 icon.parentNode.insertBefore(emojiNode, icon);
 
-toggleRandomizer(true);
+toggleRandomizer();
+emojiNode.classList.add('enabled');
 
 emojiNode.addEventListener('click', function clickHandler(e) {
-  var isDisabled = this.classList.contains('disabled');
-  this.classList.toggle('disabled', !isDisabled);
-  toggleRandomizer(isDisabled);
+  var isActive = this.classList.contains('enabled');
+  this.classList.toggle('enabled', !isActive);
+  toggleRandomizer(isActive);
   e.preventDefault();
 }, false);
 
-function toggleRandomizer(enable) {
-  if (enable !== false) {
-    TS.shared.onSendMsg = randomizer(TS.shared.onSendMsg);
-  } else {
-    TS.shared.onSendMsg = TS.shared.onSendMsg.__restore();
-  }
+function toggleRandomizer(disable) {
+    TS.shared.onSendMsg = disable === true ?
+                          TS.shared.onSendMsg.__restore() :
+                          randomizer(TS.shared.onSendMsg);
 }
 
 },{"./lib/randomizer":2,"./lib/string-to-fragment":3,"insert-css":4}],2:[function(require,module,exports){
-var emojis = Object.keys(emoji.map.colons);
+var emojis = Object.keys(TS.model.emoji_names_to_canonical_names);
+var colonsRx = TS.emoji.getColonsRx();
 
 function getRandomEmoji() {
   var randomIdx = Math.floor(Math.random() * emojis.length);
@@ -39,11 +39,9 @@ function getRandomEmoji() {
 }
 
 function replaceTextRandom(msg) {
-  emoji.init_colons();
-  msg = emoji.replace_emoticons_with_colons(msg);
-  return msg.replace(emoji.rx_colons, function (colonEmoji) {
-    var emojiKey = colonEmoji.substr(1, colonEmoji.length-2);
-    var replacement = emoji.map.colons[emojiKey];
+  msg = TS.emoji.replaceEmoticons(msg);
+  return msg.replace(colonsRx, function (colonEmoji) {
+    var replacement = TS.emoji.nameToCanonicalName(colonEmoji);
     return replacement ? getRandomEmoji() : colonEmoji;
   });
 }
